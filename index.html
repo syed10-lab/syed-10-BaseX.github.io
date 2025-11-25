@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BaseX</title>
+
+<style>
+:root{
+  --green:#0A6847;
+  --blue:#1E90FF;
+  --gold:#FFD700;
+  --white:#fff;
+  --bg:#F3F5F7;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:Inter, sans-serif;
+  text-align:center;
+  padding:30px;
+}
+
+h1{
+  font-size:38px;
+  font-weight:900;
+  color:var(--green);
+}
+
+p{
+  font-size:16px;
+  color:#555;
+}
+
+button{
+  margin-top:28px;
+  padding:15px 38px;
+  background:var(--blue);
+  color:var(--white);
+  border:none;
+  border-radius:10px;
+  font-size:18px;
+  font-weight:600;
+}
+
+button:hover{
+  background:var(--gold);
+  color:var(--green);
+}
+</style>
+
+</head>
+<body>
+
+<h1>Welcome to BaseX</h1>
+<p>Your Unlimited Firebase Alternative</p>
+
+<button onclick="start()">Get Started</button>
+
+<script>
+function start(){
+  window.location.href = "auth.html";
+}
+</script>
+
+</body>
+</html>
