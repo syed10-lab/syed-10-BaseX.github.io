@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BaseX Auth</title>
+
+<style>
+:root{
+  --green:#0A6847;
+  --blue:#1E90FF;
+  --gold:#FFD700;
+  --white:#fff;
+  --bg:#F3F5F7;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:Inter, sans-serif;
+  padding:24px;
+}
+
+.box{
+  max-width:380px;
+  margin:80px auto;
+  background:white;
+  padding:26px;
+  border-radius:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+}
+
+label{
+  font-size:14px;
+  font-weight:600;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-bottom:18px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  background:var(--green);
+  color:white;
+  font-weight:600;
+}
+
+button:hover{
+  background:var(--blue);
+}
+
+.msg{
+  margin-top:12px;
+  text-align:center;
+  color:red;
+  font-size:14px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="box">
+  <h2 style="text-align:center;color:var(--green);margin-bottom:20px;">Sign in to BaseX</h2>
+
+  <label>Email</label>
+  <input id="email" type="email" placeholder="you@example.com">
+
+  <label>Password</label>
+  <input id="password" type="password" placeholder="******">
+
+  <button onclick="auth()">Continue</button>
+
+  <div id="msg" class="msg"></div>
+</div>
+
+<script>
+const BASEX_URL = "https://4f9801a3-b73c-45f9-ac7c-6d650d5dab43-00-3imlod1ughss4.sisko.repl.co";
+
+async function auth(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
+
+  if(!email || !password){
+    msg.innerText = "Please enter email & password.";
+    return;
+  }
+
+  msg.innerText = "Checking...";
+
+  // 1) Try login
+  let login = await fetch(`${BASEX_URL}/api/login`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ email, password })
+  });
+  login = await login.json();
+
+  if(login.success){
+    msg.style.color="green";
+    msg.innerText = "Logged in!";
+    localStorage.setItem("basex_user", JSON.stringify(login.user));
+    setTimeout(()=> window.location.href="console.html", 500);
+    return;
+  }
+
+  // 2) If login fails, create account automatically
+  let create = await fetch(`${BASEX_URL}/api/users`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ name:"User", email, password })
+  });
+  create = await create.json();
+
+  if(create.success){
+    msg.style.color="green";
+    msg.innerText = "Account created!";
+    localStorage.setItem("basex_user", JSON.stringify(create.user));
+    setTimeout(()=> window.location.href="console.html", 500);
+  } else {
+    msg.style.color="red";
+    msg.innerText = "Auth failed.";
+  }
+}
+</script>
+
+</body>
+</html>
