@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BaseX – Next-Gen Backend</title>
+
+<style>
+/* BACKGROUND */
+body {
+  margin: 0;
+  font-family: Arial;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #0C8A3E, #063b22, #0A84FF);
+  background-size: 400% 400%;
+  animation: moveBg 10s infinite;
+}
+
+@keyframes moveBg {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+/* CENTER CONTENT */
+.landing {
+  text-align: center;
+  padding: 120px 20px;
+  color: white;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(to right, #FFD700, #ffffff);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shine 2.5s infinite alternate;
+}
+
+@keyframes shine {
+  from {opacity: 0.6;}
+  to {opacity: 1;}
+}
+
+.subtitle {
+  font-size: 20px;
+  margin-top: -10px;
+  opacity: 0.9;
+}
+
+.btn {
+  margin-top: 40px;
+  padding: 16px 32px;
+  background: #FFD700;
+  border: none;
+  border-radius: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  transform: scale(1.1);
+}
+
+footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  color: #ddd;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="landing">
+  <div class="title">BaseX</div>
+  <div class="subtitle">The Ultimate Firebase Alternative</div>
+
+  <button class="btn" onclick="start()">Get Started</button>
+</div>
+
+<footer>© 2025 BaseX • All Rights Reserved</footer>
+
+<script>
+function start() {
+  window.location.href = "auth.html";
+}
+</script>
+
+</body>
+</html>
