@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>BaseX OTP Signup</title>
+</head>
+<body>
+
+<h3>BaseX Signup</h3>
+
+<input id="email" placeholder="Email" />
+<button onclick="getOTP()">Get OTP</button>
+
+<br><br>
+
+<input id="otp" placeholder="Enter OTP" />
+<button onclick="verifyOTP()">Verify OTP</button>
+
+<p id="msg"></p>
+
+<script>
+const API = "https://basex.onrender.com";
+let emailSaved = "";
+
+function msg(t, ok=false) {
+  const m = document.getElementById("msg");
+  m.style.color = ok ? "green" : "red";
+  m.innerText = t;
+}
+
+async function getOTP() {
+  const email = document.getElementById("email").value;
+  emailSaved = email;
+
+  msg("Sending OTP...", true);
+
+  const res = await fetch(API + "/auth/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email })
+  });
+
+  const data = await res.json();
+  if (!res.ok) return msg(data.message);
+  msg("OTP sent to email", true);
+}
+
+async function verifyOTP() {
+  const otp = document.getElementById("otp").value;
+
+  const res = await fetch(API + "/auth/verify-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: emailSaved, otp })
+  });
+
+  const data = await res.json();
+  if (!res.ok) return msg(data.message);
+  msg("OTP verified ✅", true);
+}
+</script>
+
+</body>
+</html>
