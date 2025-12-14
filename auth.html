@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BaseX Auth</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #020806;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.card {
+  width: 360px;
+  background: #041913;
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 0 30px rgba(0,0,0,.6);
+}
+h2 { text-align: center; margin-bottom: 16px; }
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #0A84FF55;
+  background: #020E0A;
+  color: #fff;
+}
+button {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#FFD700,#0C8A3E);
+  font-weight: 700;
+  cursor: pointer;
+}
+#status { font-size: 13px; margin-top: 8px; min-height: 18px; }
+.hide { display: none; }
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h2>BaseX Signup</h2>
+
+  <!-- SIGNUP -->
+  <div id="signupBox">
+    <input id="name" placeholder="Full name"/>
+    <input id="email" type="email" placeholder="Email"/>
+    <input id="password" type="password" placeholder="Password"/>
+    <button onclick="signup()">Create account</button>
+  </div>
+
+  <!-- OTP -->
+  <div id="otpBox" class="hide">
+    <input id="otp" placeholder="Enter OTP"/>
+    <button onclick="verifyOtp()">Verify OTP</button>
+  </div>
+
+  <!-- LOGIN -->
+  <hr style="margin:16px 0;border-color:#ffffff22">
+  <h2>Login</h2>
+  <input id="loginEmail" type="email" placeholder="Email"/>
+  <input id="loginPassword" type="password" placeholder="Password"/>
+  <button onclick="login()">Login</button>
+
+  <div id="status"></div>
+</div>
+
+<script>
+const API = "https://basex.onrender.com"; // CHANGE IF NEEDED
+let signupEmail = "";
+
+function setStatus(msg, ok=false){
+  const s = document.getElementById("status");
+  s.style.color = ok ? "#00ff9d" : "#ff6b6b";
+  s.innerText = msg;
+}
+
+async function signup(){
+  const name = nameInput().value;
+  const email = emailInput().value;
+  const password = passInput().value;
+
+  if(!name || !email || !password){
+    setStatus("Fill all fields");
+    return;
+  }
+
+  setStatus("Sending OTP...", true);
+
+  const res = await fetch(API + "/auth/create", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, email, password })
+  });
+
+  const data = await res.json();
+  if(!res.ok){
+    setStatus(data.message || "Signup failed");
+    return;
+  }
+
+  signupEmail = email;
+  document.getElementById("signupBox").classList.add("hide");
+  document.getElementById("otpBox").classList.remove("hide");
+  setStatus("OTP sent to email", true);
+}
+
+async function verifyOtp(){
+  const otp = document.getElementById("otp").value;
+  if(!otp){
+    setStatus("Enter OTP");
+    return;
+  }
+
+  const res = await fetch(API + "/auth/verify-otp", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ email: signupEmail, otp })
+  });
+
+  const data = await res.json();
+  if(!res.ok){
+    setStatus(data.message || "OTP invalid");
+    return;
+  }
+
+  setStatus("Signup complete. You can login now.", true);
+}
+
+async function login(){
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  if(!email || !password){
+    setStatus("Enter email & password");
+    return;
+  }
+
+  const res = await fetch(API + "/auth/login", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+  if(!res.ok){
+    setStatus(data.message || "Login failed");
+    return;
+  }
+
+  localStorage.setItem("basex_token", data.token);
+  setStatus("Login successful", true);
+}
+
+/* helpers */
+const nameInput = () => document.getElementById("name");
+const emailInput = () => document.getElementById("email");
+const passInput = () => document.getElementById("password");
+</script>
+</body>
+</html>
