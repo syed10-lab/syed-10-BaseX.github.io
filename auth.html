@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>BaseX OTP Signup</title>
+<style>
+body {
+  background:#020806;
+  color:#fff;
+  font-family:Arial;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.box {
+  background:#041913;
+  padding:20px;
+  width:320px;
+  border-radius:10px;
+}
+input,button {
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+}
+button {
+  background:#FFD700;
+  font-weight:bold;
+  cursor:pointer;
+}
+#otpBox { display:none; }
+#msg { margin-top:10px; font-size:13px; }
+</style>
+</head>
+
+<body>
+<div class="box">
+  <h3>BaseX Signup</h3>
+
+  <div id="signupBox">
+    <input id="email" placeholder="Email" />
+    <button onclick="sendOTP()">Get OTP</button>
+  </div>
+
+  <div id="otpBox">
+    <input id="otp" placeholder="Enter OTP" />
+    <button onclick="verifyOTP()">Verify OTP</button>
+  </div>
+
+  <div id="msg"></div>
+</div>
+
+<script>
+const API = "/auth";
+let savedEmail = "";
+
+function msg(t, ok=false){
+  const m=document.getElementById("msg");
+  m.style.color=ok?"#00ff9d":"#ff6b6b";
+  m.innerText=t;
+}
+
+async function sendOTP(){
+  const email=document.getElementById("email").value;
+  if(!email) return msg("Enter email");
+
+  msg("Sending OTP...",true);
+
+  const res=await fetch(API+"/create",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({email})
+  });
+
+  const data=await res.json();
+  if(!res.ok) return msg(data.message);
+
+  savedEmail=email;
+  document.getElementById("signupBox").style.display="none";
+  document.getElementById("otpBox").style.display="block";
+  msg("OTP sent",true);
+}
+
+async function verifyOTP(){
+  const otp=document.getElementById("otp").value;
+  if(!otp) return msg("Enter OTP");
+
+  const res=await fetch(API+"/verify-otp",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({email:savedEmail, otp})
+  });
+
+  const data=await res.json();
+  if(!res.ok) return msg(data.message);
+
+  msg("Signup successful ✅",true);
+}
+</script>
+</body>
+</html>
