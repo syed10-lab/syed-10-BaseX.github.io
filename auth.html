@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BaseX Auth</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #020806;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.box {
+  width: 340px;
+  background: #041913;
+  padding: 20px;
+  border-radius: 12px;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: none;
+}
+button {
+  width: 100%;
+  padding: 10px;
+  background: #FFD700;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+#otpBox { display: none; }
+#msg { margin-top: 10px; font-size: 13px; }
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h3>Signup</h3>
+
+  <!-- SIGNUP -->
+  <div id="signupBox">
+    <input id="name" placeholder="Full name" />
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button onclick="getOTP()">Get OTP</button>
+  </div>
+
+  <!-- OTP -->
+  <div id="otpBox">
+    <input id="otp" placeholder="Enter OTP" />
+    <button onclick="verifyOTP()">Verify & Signup</button>
+  </div>
+
+  <div id="msg"></div>
+</div>
+
+<script>
+const API = "https://basex.onrender.com"; // your backend
+let savedEmail = "";
+
+function setMsg(text, ok=false) {
+  const m = document.getElementById("msg");
+  m.style.color = ok ? "#00ff9d" : "#ff6b6b";
+  m.innerText = text;
+}
+
+async function getOTP() {
+  const name = nameVal();
+  const email = emailVal();
+  const password = passVal();
+
+  if (!name || !email || !password) {
+    setMsg("Fill all fields");
+    return;
+  }
+
+  setMsg("Sending OTP...", true);
+
+  const res = await fetch(API + "/auth/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    setMsg(data.message || "OTP send failed");
+    return;
+  }
+
+  savedEmail = email;
+  document.getElementById("signupBox").style.display = "none";
+  document.getElementById("otpBox").style.display = "block";
+  setMsg("OTP sent to your email", true);
+}
+
+async function verifyOTP() {
+  const otp = document.getElementById("otp").value;
+
+  if (!otp) {
+    setMsg("Enter OTP");
+    return;
+  }
+
+  const res = await fetch(API + "/auth/verify-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: savedEmail, otp })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    setMsg(data.message || "Invalid OTP");
+    return;
+  }
+
+  setMsg("Signup successful ✅", true);
+}
+
+/* helpers */
+const nameVal = () => document.getElementById("name").value.trim();
+const emailVal = () => document.getElementById("email").value.trim();
+const passVal = () => document.getElementById("password").value.trim();
+</script>
+
+</body>
+</html>
